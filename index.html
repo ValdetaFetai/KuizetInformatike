@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kuize – Arsimi teknik dhe Informatika</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f2f6fb; --surface:#ffffff; --ink:#14213d; --muted:#5b6885; --line:#d9e1ee;
+  --c5:#0e9384; --c6:#d98a00; --c8:#6547e8;
+  --ok:#17803d; --okbg:#e3f6e9; --bad:#b42318; --badbg:#fde8e6;
+  --head:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1526; --surface:#172038; --ink:#eef2fb; --muted:#9aa8c7; --line:#2a3656;
+    --c5:#38c9b8; --c6:#f5b83d; --c8:#9b86ff;
+    --ok:#6fdc93; --okbg:#143824; --bad:#ff8a80; --badbg:#3d1a1a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1526; --surface:#172038; --ink:#eef2fb; --muted:#9aa8c7; --line:#2a3656;
+  --c5:#38c9b8; --c6:#f5b83d; --c8:#9b86ff;
+  --ok:#6fdc93; --okbg:#143824; --bad:#ff8a80; --badbg:#3d1a1a;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.55 var(--body)}
+main{max-width:860px;margin:0 auto;padding:28px 18px 56px}
+h1,h2,h3{font-family:var(--head);line-height:1.15;margin:0}
+h1{font-size:clamp(28px,6vw,44px);font-weight:800;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:8px 0 26px;max-width:52ch}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+/* class picker */
+.klasat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.klasa{--c:var(--c5);background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:16px 12px 14px;text-align:left;display:flex;flex-direction:column;gap:2px;transition:border-color .15s,transform .15s}
+.klasa[data-k="6"]{--c:var(--c6)} .klasa[data-k="8"]{--c:var(--c8)}
+.klasa .nr{font:800 clamp(54px,14vw,92px)/.9 var(--head);color:var(--c)}
+.klasa .em{font-weight:700;font-size:15px}
+.klasa .sh{font-size:14px;color:var(--muted)}
+.klasa[aria-pressed="true"]{border-color:var(--c);box-shadow:0 6px 0 var(--c);transform:translateY(-3px)}
+.shkolla{display:inline-block;background:var(--ink);color:var(--bg);font:700 15px/1 var(--head);border-radius:999px;padding:8px 16px;margin-bottom:14px}
+footer{margin-top:48px;text-align:center;color:var(--muted);font-size:14px}
+.krye{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.krye .shkolla{margin-bottom:0}
+.mesuesja{margin-left:auto;text-align:right;font:700 15px/1.2 var(--head);color:var(--muted)}
+.lenda{font-weight:700;color:var(--muted);font-size:15px;margin-bottom:6px}
+
+/* quiz list */
+.lista{margin-top:30px}
+.lista h2{font-size:26px;margin-bottom:14px}
+.kuizet{display:grid;gap:12px}
+.kuiz{--c:var(--c5);display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-left:8px solid var(--c);border-radius:14px;padding:14px 16px}
+.kuiz:hover{border-color:var(--c)}
+.kuiz b{font-family:var(--head);font-size:19px;display:block}
+.kuiz span{color:var(--muted);font-size:15px}
+.kuiz .fillo{flex:none;background:var(--c);color:#fff;border-radius:999px;padding:8px 18px;font-weight:700}
+.zbrazet{background:var(--surface);border:2px dashed var(--line);border-radius:14px;padding:28px 18px;color:var(--muted);text-align:center}
+
+/* runner */
+.runner{margin-top:6px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.mbrapa{background:none;border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700}
+.bar{flex:1;height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--kc);width:0;transition:width .25s}
+.pn{font-weight:700;color:var(--muted);font-size:15px;white-space:nowrap}
+.pyetja{font-family:var(--head);font-weight:600;font-size:clamp(21px,4.5vw,28px);line-height:1.3;margin:6px 0 18px}
+.opsione{display:grid;gap:10px}
+.opsion{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
+.opsion .ch{flex:none;width:30px;height:30px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-weight:800;font-size:15px}
+.opsion:not(:disabled):hover{border-color:var(--kc)}
+.opsion:disabled{cursor:default}
+.opsion.sakte{border-color:var(--ok);background:var(--okbg)}
+.opsion.gabim{border-color:var(--bad);background:var(--badbg)}
+.opsion.sakte .ch{background:var(--ok);color:#fff}
+.opsion.gabim .ch{background:var(--bad);color:#fff}
+.fb{margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--surface);border:2px solid var(--line)}
+.fb b{display:block;font-family:var(--head);font-size:18px}
+.fb.ok b{color:var(--ok)} .fb.no b{color:var(--bad)}
+.tjeter{margin-top:16px;background:var(--kc);color:#fff;border:0;border-radius:999px;padding:12px 26px;font-weight:800}
+.rez{text-align:center;padding:26px 8px}
+.rez .pik{font:800 clamp(60px,18vw,110px)/1 var(--head);color:var(--kc)}
+.rez p{color:var(--muted);margin:8px 0 20px}
+.rez .rreshti{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.dyt{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:12px 22px;font-weight:700}
+.emri,.mf input,.mf select{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;max-width:340px}
+.kart{margin:14px auto 22px;max-width:420px;background:var(--surface);border:2px dashed var(--kc);border-radius:14px;padding:12px 14px;font-weight:700;user-select:all}
+.rez small{display:block;color:var(--muted);margin-top:-14px;margin-bottom:18px}
+#renditja,#mesues{margin-top:44px;padding-top:26px;border-top:2px solid var(--line)}
+#renditja h2,#mesues h2{font-size:26px;margin-bottom:10px}
+.fitues{font-weight:700;font-size:19px;margin:0 0 14px}
+.rr{--c:var(--c5);background:var(--surface);border:2px solid var(--line);border-left:8px solid var(--c);border-radius:14px;padding:12px 16px;margin-bottom:10px;display:grid;gap:2px}
+.rr b{font-family:var(--head);font-size:19px}
+.rr span{color:var(--muted);font-size:15px}
+.rr.fit{border-color:var(--c);box-shadow:0 5px 0 var(--c)}
+.yll{margin-top:16px;background:var(--ink);color:var(--bg);border-radius:14px;padding:14px 18px;display:grid;gap:2px}
+.yll b{font-family:var(--head);font-size:20px}
+.mf{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.mf input,.mf select{max-width:none}
+.dyt.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ent{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:15px}
+.ent button{background:none;border:0;color:var(--bad);font-weight:700}
+#stat{margin:10px 0 0;font-weight:700;color:var(--muted)}
+.kartat{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0}
+.kt{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px}
+.kt b{font-family:var(--head);font-size:26px;display:block}.kt span{color:var(--muted);font-size:14px}
+.tw{overflow-x:auto;margin:10px 0}.tb{width:100%;border-collapse:collapse;font-size:14px}
+.tb th,.tb td{text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}.tb th{cursor:pointer;color:var(--muted)}
+#paneli h2{font-size:26px;margin:18px 0 8px}#paneli h3{margin:20px 0 8px}
+.hidden{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:420px){.klasa{padding:12px 8px}.klasa .em{font-size:13px}.klasa .sh{font-size:12px}}
+
+/* dizajn i ri */
+body{background:linear-gradient(180deg,#dbeafe 0,var(--bg) 340px) no-repeat,var(--bg)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:linear-gradient(180deg,#1b2a55 0,var(--bg) 340px) no-repeat,var(--bg)}}
+.krye{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 16px;box-shadow:0 4px 0 var(--line)}
+h1::after{content:"";display:block;width:84px;height:6px;border-radius:99px;margin-top:10px;background:linear-gradient(90deg,var(--c5),var(--c6),var(--c8))}
+.klasa{border-radius:24px;padding:18px 14px 16px;box-shadow:0 4px 0 var(--line)}
+.klasa .ik{font-size:30px;line-height:1}
+.klasa:hover{transform:translateY(-3px);border-color:var(--c)}
+.kuiz{border-radius:18px;box-shadow:0 3px 0 var(--line)}
+.kuiz .fillo{box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.foto{margin:0 0 16px}.foto svg{width:100%;max-width:440px;display:block;border-radius:14px;border:3px solid var(--line)}
+@media (max-width:520px){.klasat{gap:8px}.klasa .em{font-size:13px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="krye"><div class="shkolla">Sh.F.K „Përparimi“ – Cegran</div><div class="mesuesja">ARS. Valdeta A Fetai</div></div>
+  <div class="lenda">Arsimi teknik dhe Informatika</div>
+  <h1>Kuize për nxënës</h1>
+  <p class="sub">Zgjidh klasën, pastaj zgjidh kuizin dhe testo çfarë ke mësuar.</p>
+
+  <div class="klasat" id="klasat" role="group" aria-label="Zgjidh klasën"></div>
+
+  <section class="lista" id="lista" aria-live="polite"></section>
+  <section class="runner hidden" id="runner"></section>
+  <footer>Sh.F.K „Përparimi“ – Cegran</footer>
+</main>
+<script src="config.js"></script>
+<script src="kuizet/kl5.js"></script>
+<script src="kuizet/kl6.js"></script>
+<script src="kuizet/kl8.js"></script>
+<script>
+/* ====== KUIZET ======
+   Kuizet ndodhen te folder-i (dosja) kuizet/. Për një kuiz të ri shto një skedar (fajll) atje dhe një rresht <script src> më sipër.
+   Struktura e një kuizi (shtohet brenda listës QUIZZES):
+   {
+     klasa: 5 | 6 | 8,
+     titulli: "Titulli i kuizit",
+     pershkrimi: "Përshkrim i shkurtër (opsional)",
+     pyetjet: [
+       { p: "Pyetja?", opsionet: ["A","B","C","D"], sakte: 0, shpjegim: "Pse është e saktë (opsional)" }
+     ]
+   }
+*/
+
+const KLASAT = [
+  {k:5, em:"Informatika kl. 5"},
+  {k:6, em:"Informatika kl. 6"},
+  {k:8, em:"Informatika kl. 8"}
+];
+const COLORS = {5:"var(--c5)",6:"var(--c6)",8:"var(--c8)"};
+let aktive = KLASAT[0].k;
+
+function el(tag, props, kids){
+  const n = document.createElement(tag);
+  for (const k in (props||{})){
+    if (k==="class") n.className = props[k];
+    else if (k==="text") n.textContent = props[k];
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), props[k]);
+    else n.setAttribute(k, props[k]);
+  }
+  (kids||[]).forEach(c => n.appendChild(c));
+  return n;
+}
+const $ = id => document.getElementById(id);
+const numri = n => n===1 ? "1 kuiz" : n+" kuize";
+
+function vizatoKlasat(){
+  const box = $("klasat"); box.innerHTML = "";
+  KLASAT.forEach(o => {
+    const n = QUIZZES.filter(q => q.klasa===o.k).length;
+    box.appendChild(el("button",{class:"klasa","data-k":o.k,"aria-pressed":String(o.k===aktive),
+      onclick:()=>{aktive=o.k; vizatoKlasat(); vizatoLista();}},[
+      el("span",{class:"ik",text:{5:"💻",6:"🖥️",8:"🤖"}[o.k]||"📘"}),
+      el("span",{class:"nr",text:String(o.k)}),
+      el("span",{class:"em",text:o.em}),
+      el("span",{class:"sh",text:numri(n)})
+    ]));
+  });
+}
+
+function vizatoLista(){
+  const L = $("lista"); L.innerHTML = "";
+  const o = KLASAT.find(x => x.k===aktive);
+  L.appendChild(el("h2",{text:o.em}));
+  const lista = QUIZZES.filter(q => q.klasa===aktive);
+  if (!lista.length){
+    L.appendChild(el("div",{class:"zbrazet",text:"Ende nuk ka kuize për këtë klasë. Kthehu pas pak."}));
+    return;
+  }
+  const wrap = el("div",{class:"kuizet"});
+  lista.forEach(q => {
+    const b = el("button",{class:"kuiz",style:"--c:"+COLORS[q.klasa],onclick:()=>nis(q)},[
+      el("div",{},[
+        el("b",{text:q.titulli}),
+        el("span",{text:(q.pershkrimi ? q.pershkrimi+" · " : "")+q.pyetjet.length+" pyetje"})
+      ]),
+      el("span",{class:"fillo",text:"Fillo"})
+    ]);
+    wrap.appendChild(b);
+  });
+  L.appendChild(wrap);
+}
+
+function nis(q){
+  let i = 0, pike = 0, resp = [];
+  let qrend = q.pyetjet.map((_,x) => x); /* radhitja e pyetjeve (përzihet për kuizet me "perziej": true) */
+  const R = $("runner");
+  $("klasat").classList.add("hidden"); $("lista").classList.add("hidden");
+  R.classList.remove("hidden");
+  R.style.setProperty("--kc", COLORS[q.klasa]);
+  window.scrollTo(0,0);
+
+  function dil(){
+    R.classList.add("hidden"); R.innerHTML = "";
+    $("klasat").classList.remove("hidden"); $("lista").classList.remove("hidden");
+  }
+  let stud = null;
+  function fillimi(){
+    R.innerHTML = "";
+    R.appendChild(el("div",{class:"top"},[ el("button",{class:"mbrapa",text:"Mbrapa",onclick:dil}) ]));
+    R.appendChild(el("h2",{class:"pyetja",text:q.titulli}));
+    R.appendChild(el("p",{text:"Shkruaj të dhënat e tua para se të fillosh kuizin."}));
+    const inp = (id,ph) => el("input",{type:"text",class:"emri",id:id,placeholder:ph,"aria-label":ph,autocomplete:"off"});
+    const fe = inp("f-emri","Emri"), fm = inp("f-mbiemri","Mbiemri"), fk = inp("f-klasa","Klasa (p.sh. 8-1)"), fc = inp("f-kodi","Kodi i kuizit");
+    const gabim = el("div",{class:"fb no hidden"},[ el("b",{text:""}) ]);
+    const nis2 = () => {
+      const e = fe.value.trim(), m = fm.value.trim(), k = fk.value.trim(), c = fc.value.trim();
+      let msg = "";
+      if (!e || !m || !k || !c) msg = "Plotëso të gjitha fushat: emrin, mbiemrin, klasën dhe kodin.";
+      else if (KODET[q.klasa] && c.toUpperCase().replace(/\s+/g,"") !== KODET[q.klasa].toUpperCase()) msg = "Kodi nuk është i saktë. Kërkoja mësuesit kodin e kuizit.";
+      if (msg){ gabim.firstChild.textContent = msg; gabim.classList.remove("hidden"); return; }
+      stud = {e:e, m:m, k:k};
+      qrend = q.pyetjet.map((_,x) => x);
+      if (q.perziej){
+        for (let a = qrend.length-1; a > 0; a--){
+          const b2 = Math.floor(Math.random()*(a+1));
+          const tmp = qrend[a]; qrend[a] = qrend[b2]; qrend[b2] = tmp;
+        }
+      }
+      pyetja();
+    };
+    [fe,fm,fk,fc].forEach(x => x.addEventListener("keydown", ev => { if (ev.key==="Enter") nis2(); }));
+    const form = el("div",{class:"mf"},[ fe, fm, fk, fc ]);
+    form.style.cssText = "display:grid;gap:10px;max-width:340px;margin:14px 0";
+    R.appendChild(form);
+    R.appendChild(gabim);
+    R.appendChild(el("button",{class:"tjeter",text:"Fillo kuizin",onclick:nis2}));
+    fe.focus();
+  }
+  function top(){
+    return el("div",{class:"top"},[
+      el("button",{class:"mbrapa",text:"Mbrapa",onclick:dil}),
+      el("div",{class:"bar","aria-hidden":"true"},[ (()=>{const x=el("i"); x.style.width=(i/q.pyetjet.length*100)+"%"; return x;})() ]),
+      el("span",{class:"pn",text:Math.min(i+1,q.pyetjet.length)+" / "+q.pyetjet.length})
+    ]);
+  }
+  function pyetja(){
+    R.innerHTML = "";
+    const qi = qrend[i];
+    const p = q.pyetjet[qi];
+    R.appendChild(top());
+    R.appendChild(el("h2",{class:"pyetja",text:p.p}));
+    if (p.foto){ const fo = el("div",{class:"foto"}); fo.innerHTML = p.foto; R.appendChild(fo); }
+    const ops = el("div",{class:"opsione"});
+    const btns = [];
+    const fbBox = el("div");
+    /* Radhitja e opsioneve përzihet në çdo pajisje dhe çdo herë (vetëm për kuizet me "perziej": true) */
+    const rend = p.opsionet.map((_,x) => x);
+    if (q.perziej){
+      for (let a = rend.length-1; a > 0; a--){
+        const b2 = Math.floor(Math.random()*(a+1));
+        const tmp = rend[a]; rend[a] = rend[b2]; rend[b2] = tmp;
+      }
+    }
+    const ds = rend.indexOf(p.sakte);
+    rend.forEach((oi,j) => {
+      const t = p.opsionet[oi];
+      const b = el("button",{class:"opsion",onclick:()=>zgjidh(j)},[
+        el("span",{class:"ch",text:String.fromCharCode(65+j)}),
+        el("span",{text:t})
+      ]);
+      btns.push(b); ops.appendChild(b);
+    });
+    R.appendChild(ops); R.appendChild(fbBox);
+    function zgjidh(j){
+      btns.forEach((b,k)=>{
+        b.disabled = true;
+        if (k===ds) b.classList.add("sakte");
+        else if (k===j) b.classList.add("gabim");
+      });
+      const ok = j===ds;
+      resp[qi] = rend[j]; /* te dashboard ruhet pyetja dhe opsioni sipas radhës origjinale, jo sipas shfaqjes */
+      if (ok) pike++;
+      const fb = el("div",{class:"fb "+(ok?"ok":"no")},[
+        el("b",{text: ok ? "Saktë!" : "Jo saktë. Përgjigjja e duhur: "+String.fromCharCode(65+ds)+"."})
+      ]);
+      if (p.shpjegim) fb.appendChild(el("span",{text:p.shpjegim}));
+      fbBox.appendChild(fb);
+      const last = i===q.pyetjet.length-1;
+      const nx = el("button",{class:"tjeter",text: last ? "Shiko rezultatin" : "Pyetja tjetër",onclick:()=>{ i++; last ? rezultati() : pyetja(); }});
+      fbBox.appendChild(nx); nx.focus();
+    }
+  }
+  function rezultati(){
+    R.innerHTML = "";
+    i = q.pyetjet.length;
+    R.appendChild(top());
+    const n = q.pyetjet.length, p = pike/n;
+    const msg = "Vlerësimi: " + (p>.9 ? "shkëlqyeshëm" : p>.75 ? "shumë mirë" : p>=.6 ? "mirë" : "i dobët") + " ("+Math.round(p*100)+"%).";
+    const kart = el("div",{class:"kart"});
+    kart.textContent = stud.e+" "+stud.m+" · kl. "+stud.k+" · "+q.titulli+" · "+pike+"/"+n+" pikë · "+new Date().toLocaleDateString("sq-AL");
+    R.appendChild(el("div",{class:"rez"},[
+      el("div",{class:"pik",text:pike+" / "+n}),
+      el("p",{text:msg}),
+      el("p",{text:"Ia trego mësuesit kartelën më poshtë (mund ta fotografosh me telefon)."}),
+      kart,
+      el("div",{class:"rreshti"},[
+        el("button",{class:"dyt",text:"Provo përsëri",onclick:()=>{i=0;pike=0;resp=[];fillimi();}}),
+        el("button",{class:"dyt",text:"Kthehu te kuizet",onclick:dil})
+      ])
+    ]));
+  }
+  fillimi();
+}
+
+vizatoKlasat(); vizatoLista();
+</script>
+</body>
+</html>
